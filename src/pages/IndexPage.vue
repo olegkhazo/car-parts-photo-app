@@ -72,6 +72,7 @@ const startCamera = async () => {
 const stopCamera = () => {
   const stream = videoElement.value.srcObject;
   const tracks = stream.getTracks();
+
   tracks.forEach((track) => track.stop());
   cameraActive.value = false;
 };
