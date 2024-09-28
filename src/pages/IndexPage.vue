@@ -18,6 +18,19 @@
           opacity: 0.5;
         "
       />
+      <q-btn
+        label="Switch Camera"
+        flat
+        @click="switchCamera"
+        style="
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background-color: #dcdad2a6;
+          z-index: 10;
+          opacity: 0.5;
+        "
+      />
       <video ref="videoElement" autoplay playsinline></video>
 
       <q-btn
@@ -58,11 +71,14 @@ const videoElement = ref(null);
 const canvasElement = ref(null);
 const cameraActive = ref(false);
 const photoCollection = ref([]);
+const facingMode = ref("environment");
 
 const startCamera = async () => {
   cameraActive.value = true;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facingMode.value },
+    });
     videoElement.value.srcObject = stream;
   } catch (error) {
     console.error("Error accessing the camera:", error);
@@ -77,6 +93,15 @@ const stopCamera = () => {
   cameraActive.value = false;
 };
 
+const switchCamera = async () => {
+  // Camera switcher
+  facingMode.value = facingMode.value === "user" ? "environment" : "user";
+
+  stopCamera();
+
+  await startCamera();
+};
+
 const takePhoto = () => {
   const context = canvasElement.value.getContext("2d");
 
@@ -87,9 +112,7 @@ const takePhoto = () => {
   const photoData = canvasElement.value.toDataURL("image/png");
   photoCollection.value.push(photoData);
 
-  setTimeout(() => {
-    // For now it's a pause but you can do another action when photo action
-  }, 5000);
+  setTimeout(() => {}, 5000);
 };
 
 onBeforeUnmount(() => {
